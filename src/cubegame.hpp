@@ -15,6 +15,9 @@ private:
   bool fullscreen;
   // Variables rendering
   Camera3D camera;
+  // Variables cube
+  float cube_side_pos;
+  float cube_vel;
   // Important functions
   void init();
   void main_loop();
@@ -23,6 +26,8 @@ private:
   void calc();
   // Functions
   void toggle_fullscreen();
+  void init_camera();
+  void init_window();
 
 public:
   int run();
