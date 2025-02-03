@@ -2,7 +2,12 @@
 #define INCLUDE_CUBEGAMEHPP
 
 #include "raylib.h"
+#include <cstdint>
 #include <string>
+
+#define INPUT_NEUTRAL 0
+#define INPUT_LEFT 1
+#define INPUT_RIGHT 2
 
 namespace CubeGame {
 class Game {
@@ -18,6 +23,9 @@ private:
   // Variables cube
   float cube_side_pos;
   float cube_vel;
+  float cube_size;
+  // Input variables
+  uint8_t direction;
   // Important functions
   void init();
   void main_loop();
@@ -25,9 +33,11 @@ private:
   void input();
   void calc();
   // Functions
+  void draw_debug_gui();
   void toggle_fullscreen();
   void init_camera();
   void init_window();
+  void calc_cube();
 
 public:
   int run();

@@ -7,6 +7,7 @@
 void CubeGame::Game::init() {
   init_window();
   init_camera();
+  cube_size = 2.0;
   rlImGuiSetup(true);
 }
 
@@ -29,6 +30,15 @@ void CubeGame::Game::init_camera() {
   camera.projection = CAMERA_PERSPECTIVE;
 }
 
+void CubeGame::Game::draw_debug_gui() {
+  rlImGuiBegin();
+  ImGui::Begin("Debug info");
+  ImGui::Text("fps: %i", GetFPS());
+  ImGui::Text("direction: %i", direction);
+  ImGui::End();
+  rlImGuiEnd();
+}
+
 void CubeGame::Game::drawing() {
   BeginDrawing();
 
@@ -36,17 +46,18 @@ void CubeGame::Game::drawing() {
 
   BeginMode3D(camera);
 
-  Vector3 cubePosition = {0.0, 0.0, 3.0};
-  DrawCube(cubePosition, 2.0, 2.0, 2.0, RED);
-  DrawCubeWires(cubePosition, 2.0, 2.0, 2.0, MAROON);
+  Vector3 cubePosition = {cube_side_pos, 0.0, 3.0};
+  Vector3 cube_size_full = {
+      cube_size,
+      cube_size,
+      cube_size,
+  };
+  DrawCubeV(cubePosition, cube_size_full, RED);
+  DrawCubeWiresV(cubePosition, cube_size_full, MAROON);
 
   EndMode3D();
 
-  rlImGuiBegin();
-  ImGui::Begin("Hello world");
-  ImGui::Text("fps: %i", GetFPS());
-  ImGui::End();
-  rlImGuiEnd();
+  draw_debug_gui();
 
   EndDrawing();
 }
@@ -55,6 +66,13 @@ void CubeGame::Game::input() {
   if (IsKeyPressed(KEY_F11)) {
     toggle_fullscreen();
   }
+  if (IsKeyDown(KEY_A)) {
+    direction = INPUT_LEFT;
+  } else if (IsKeyDown(KEY_D)) {
+    direction = INPUT_RIGHT;
+  } else {
+    direction = INPUT_NEUTRAL;
+  }
 }
 
 void CubeGame::Game::calc() {
@@ -62,6 +80,28 @@ void CubeGame::Game::calc() {
     window_size = {static_cast<float>(GetScreenWidth()),
                    static_cast<float>(GetScreenHeight())};
   }
+  calc_cube();
+}
+
+void CubeGame::Game::calc_cube() {
+  if (cube_vel <= 0.1 && cube_vel >= -0.1) {
+    if (direction == INPUT_LEFT) {
+      cube_vel -= .01;
+    } else if (direction == INPUT_RIGHT) {
+      cube_vel += .01;
+    }
+  }
+  if (direction == INPUT_NEUTRAL) {
+    if (cube_vel > 0) {
+      cube_vel -= .01;
+    } else if (cube_vel < 0) {
+      cube_vel += .01;
+    }
+    if (cube_vel < .0001 && cube_vel > -.0001) {
+      cube_vel = 0.0;
+    }
+  }
+  cube_side_pos += cube_vel;
 }
 
 void CubeGame::Game::main_loop() {
